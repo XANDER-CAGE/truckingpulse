@@ -34,10 +34,9 @@ class ApiLog extends ActiveRecord
     {
         return [
             [['method', 'status', 'created_at'], 'required'],
-            [['request', 'response', 'error'], 'string'],
-            [['duration', 'created_at'], 'integer'],
-            [['method'], 'string', 'max' => 50],
-            [['status'], 'string', 'max' => 20],
+            [['request', 'response'], 'string'],
+            [['duration', 'created_at', 'status'], 'integer'],
+            [['method'], 'string', 'max' => 100],
         ];
     }
 
@@ -51,15 +50,14 @@ class ApiLog extends ActiveRecord
             'method' => 'Метод',
             'request' => 'Запрос',
             'response' => 'Ответ',
-            'status' => 'Статус',
-            'error' => 'Ошибка',
-            'duration' => 'Длительность (мс)',
-            'created_at' => 'Дата создания',
+            'status' => 'Код статуса',
+            'duration' => 'Время выполнения (мс)',
+            'created_at' => 'Дата запроса',
         ];
     }
     
     /**
-     * Получить красивую дату создания
+     * Получить дату создания в красивом формате
      * 
      * @return string
      */
@@ -69,24 +67,64 @@ class ApiLog extends ActiveRecord
     }
 
     /**
-     * Получить краткое описание запроса
+     * Получить URL из запроса
      * 
-     * @param int $length Максимальная длина
      * @return string
      */
-    public function getRequestShort($length = 100)
+    public function getRequestUrl()
     {
-        return $this->request ? mb_substr($this->request, 0, $length) . (mb_strlen($this->request) > $length ? '...' : '') : '';
+        try {
+            $requestData = json_decode($this->request, true);
+            return $requestData['url'] ?? 'N/A';
+        } catch (\Exception $e) {
+            return 'N/A';
+        }
     }
 
     /**
-     * Получить краткое описание ответа
+     * Получить HTTP-метод
+     * 
+     * @return string
+     */
+    public function getRequestMethod()
+    {
+        try {
+            $requestData = json_decode($this->request, true);
+            return $requestData['method'] ?? 'N/A';
+        } catch (\Exception $e) {
+            return 'N/A';
+        }
+    }
+
+    /**
+     * Получить краткую информацию о запросе
      * 
      * @param int $length Максимальная длина
      * @return string
      */
-    public function getResponseShort($length = 100)
+    public function getRequestPreview($length = 200)
     {
-        return $this->response ? mb_substr($this->response, 0, $length) . (mb_strlen($this->response) > $length ? '...' : '') : '';
+        try {
+            $requestData = json_decode($this->request, true);
+            $preview = json_encode($requestData['body'] ?? [], JSON_UNESCAPED_UNICODE);
+            return mb_strlen($preview) > $length 
+                ? mb_substr($preview, 0, $length) . '...' 
+                : $preview;
+        } catch (\Exception $e) {
+            return 'N/A';
+        }
+    }
+
+    /**
+     * Получить уровень важности лога
+     * 
+     * @return string
+     */
+    public function getSeverityLevel()
+    {
+        if ($this->status >= 500) return 'critical';
+        if ($this->status >= 400) return 'error';
+        if ($this->status >= 300) return 'warning';
+        return 'info';
     }
 }

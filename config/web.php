@@ -17,6 +17,11 @@ $config = [
         ],
     ],
     'components' => [
+        'bruteforceProtection' => [
+            'class' => 'app\components\BruteforceProtection',
+            'maxAttempts' => 5,  // Максимальное количество попыток
+            'blockDuration' => 3600,  // Блокировка на час
+        ],
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => '9qa-KYoln-s9yHrKb5XwYJYIF_t2QZ_Z',
