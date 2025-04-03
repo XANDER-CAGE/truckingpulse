@@ -11,6 +11,11 @@ $config = [
         '@bower' => '@vendor/bower-asset',
         '@npm'   => '@vendor/npm-asset',
     ],
+    'modules' => [
+        'api' => [
+            'class' => 'app\modules\api\Module',
+        ],
+    ],
     'components' => [
         'request' => [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
@@ -73,10 +78,15 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'api/<controller:\w+>/<action:\w+>' => 'api/<controller>/<action>',
-                '<controller:\w+>/<id:\d+>' => '<controller>/view',
-                '<controller:\w+>/<action:\w+>/<id:\d+>' => '<controller>/<action>',
-                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+                // API endpoints
+                'api/login' => 'api/default/login',
+                'api/logout' => 'api/default/logout',
+                'api/<controller:[\w-]+>' => 'api/<controller>/index',
+                'api/<controller:[\w-]+>/<id:\d+>' => 'api/<controller>/view',
+                'api/<controller:[\w-]+>/create' => 'api/<controller>/create', 
+                'api/<controller:[\w-]+>/<id:\d+>/update' => 'api/<controller>/update',
+                'api/<controller:[\w-]+>/<id:\d+>/delete' => 'api/<controller>/delete',
+                
             ],
         ],
     ],
@@ -96,7 +106,7 @@ if (YII_ENV_DEV) {
     $config['modules']['gii'] = [
         'class' => 'yii\gii\Module',
         // uncomment the following to add your IP if you are not connecting from localhost.
-        //'allowedIPs' => ['127.0.0.1', '::1'],
+        'allowedIPs' => ['*', '::1'],
     ];
 }
 

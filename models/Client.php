@@ -108,6 +108,37 @@ class Client extends ActiveRecord
         ];
     }
 
+    public function fields()
+    {
+        return [
+            'id',
+            'carrier_id',
+            'company_name',
+            'contact_name',
+            'email',
+            'phone',
+            'address',
+            'city',
+            'state',
+            'zip',
+            'country',
+            'status',
+            'rebate_type',
+            'rebate_value',
+            'created_at',
+            'updated_at',
+        ];
+    }
+
+    public function extraFields()
+    {
+        return [
+            'cards',
+            'transactions',
+            'invoices',
+        ];
+    }
+
     /**
      * Получить все карты клиента
      *
